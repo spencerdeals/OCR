@@ -1,26 +1,44 @@
+// index.js — backend with ScrapingBee integration
 import express from "express";
 import cors from "cors";
-import multer from "multer";
+import fetch from "node-fetch";
 
 const app = express();
-const upload = multer({ storage: multer.memoryStorage() });
+app.use(cors({ origin: true }));
 
-app.use(cors());
-app.use(express.json());
+// Your ScrapingBee API key
+const SCRAPINGBEE_API_KEY = "QKV82QIFPXY7Y0KJ7X1565W2ZQIE9D3CDYD2TMBYF7OQP7S08SFZLNSSXKVCMOOSJIRY4HA79A81B33L";
 
-app.get("/health", (_req, res) => {
-  res.json({ ok: true, service: "OCR", version: "1.0.0" });
+// Health check
+app.get(["/", "/health"], (_req, res) => {
+  res.json({ ok: true, version: "alpha-scrapingbee" });
 });
 
-app.post("/extract", upload.array("file"), async (req, res) => {
+// Metadata fetch route
+app.get("/meta", async (req, res) => {
+  const url = req.query.url;
+  if (!url) return res.status(400).json({ name: null, error: "Missing url" });
+
   try {
-    const files = req.files || [];
-    const texts = files.map((f) => `Scanned text from ${f.originalname}`);
-    res.json({ text: texts.join("\n"), texts, links: [] });
+    const apiUrl = `https://app.scrapingbee.com/api/v1/?api_key=${SCRAPINGBEE_API_KEY}&url=${encodeURIComponent(
+      url
+    )}&extract_rules={"title":"title","price":"meta[property='og:price:amount']@content"}`;
+
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+
+    res.json({
+      name: data.title || null,
+      price: data.price || null,
+    });
   } catch (err) {
-    res.status(500).json({ error: err?.message || String(err) });
+    console.error("ScrapingBee error:", err);
+    res.status(500).json({ name: null, error: "Scraping failed" });
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`OCR server running on port ${PORT}`));
+// Start server
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
