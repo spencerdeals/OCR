@@ -1,42 +1,38 @@
-// index.js
-import express from "express";
-import cors from "cors";
+// OCR Service — Step 1 baseline (CommonJS)
+const express = require("express");
+const cors = require("cors");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+app.use(cors({ origin: "*"}));
+app.use(express.json({ limit: "2mb" }));
 
-// Health check
 app.get(["/", "/health"], (_req, res) => {
-  res.json({ ok: true, version: "alpha", calc: "price-sum" });
-});
-
-// Quote endpoint (placeholder for your logic)
-app.post("/quote", (req, res) => {
-  const { items } = req.body;
-
-  if (!items || !Array.isArray(items)) {
-    return res.status(400).json({ error: "Invalid request, items required" });
-  }
-
-  // Very basic calc — sum of (qty × price)
-  const total = items.reduce((sum, item) => {
-    const qty = Number(item.qty || 0);
-    const price = Number(item.price || 0);
-    return sum + qty * price;
-  }, 0);
-
   res.json({
     ok: true,
-    total,
-    itemCount: items.length,
+    service: "ocr",
+    version: "1.0.0-step1",
+    time: new Date().toISOString(),
+    commit: process.env.RAILWAY_GIT_COMMIT_SHA || null
   });
 });
 
-// Start server
+// Stub endpoint for now — we'll wire real extraction in Step 2
+app.post("/extract", async (req, res) => {
+  const { url } = req.body || {};
+  res.json({
+    ok: true,
+    receivedUrl: url || null,
+    status: "stub",
+    note: "Extractor will be implemented in Step 2"
+  });
+});
+
+app.use((_req, res) => {
+  res.status(404).json({ ok: false, error: "Not found" });
+});
+
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`[ocr] service up on :${PORT}`);
 });
