@@ -1,15 +1,16 @@
 {
-  "name": "ocr-service",
-  "version": "1.2.0",
+  "name": "instant-quote-backend",
+  "version": "1.0.0",
+  "description": "Instant Quote backend (#alpha) with GET/POST /quote and robust scraping",
+  "main": "index.js",
   "scripts": {
     "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",
     "express": "^4.19.2"
-  },
-  "engines": {
-    "node": ">=18"
   }
-}
