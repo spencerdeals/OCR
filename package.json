@@ -1,7 +1,8 @@
 {
   "name": "instant-quote-backend",
   "version": "1.0.0",
-  "description": "Instant Quote backend (#alpha) with GET/POST /quote and robust scraping",
+  "private": true,
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -14,3 +15,4 @@
     "cors": "^2.8.5",
     "express": "^4.19.2"
   }
+}
