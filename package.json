@@ -1,10 +1,11 @@
 {
   "name": "ocr-service",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
+    "cheerio": "^1.0.0",
     "cors": "^2.8.5",
     "express": "^4.19.2"
   },
